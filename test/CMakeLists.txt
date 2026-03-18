@@ -9,6 +9,7 @@ find_package(Threads REQUIRED)
 add_executable(test
     main.cpp
     worker.cpp
+    workerhandler.cpp
 )
 
 target_link_libraries(test PRIVATE Threads::Threads)

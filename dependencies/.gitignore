@@ -1,10 +1,0 @@
-*~
-**/logs
-**/downloads
-dirExt.prop
-dirExt-debug-vtk-leaks.prop
-lib/
-paths.pri
-paths-debug-vtk-leaks.pri
-programs.prop
-lib.*/
