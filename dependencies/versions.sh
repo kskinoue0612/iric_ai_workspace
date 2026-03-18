@@ -12,16 +12,6 @@ do
   eval "${line//set/export}"
 done < <(grep '^set \(.*\)_VER=\(.*\)' versions.cmd)
 
-# replace . with _
-BOOST_UVER=${BOOST_VER//\./_}
-EXPAT_UVER=${EXPAT_VER//\./_}
-OPENSSL_UVER=${OPENSSL_VER//\./_}
-
-# remove .  (Not sure if this is still used)
-LIBPNG_NVER=${LIBPNG_NVER//\./}
-
-export BOOST_UVER EXPAT_UVER OPENSSL_UVER LIBPNG_NVER
-
 if [ -z "$BUILD_TOOLS" ]; then
   export BUILD_TOOLS="OFF"
 fi

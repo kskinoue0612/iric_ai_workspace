@@ -9,66 +9,29 @@
 
   <!-- all -->
   <ItemGroup>
-    <all-targets Include="boost-src"/>
-    <all-targets Include="expat-build"/>
-    <all-targets Include="gdal-build"/>
-    <all-targets Include="geos-build"/>
     <all-targets Include="hdf5-build"/>
-    <all-targets Include="iriclib-build"/>
-    <all-targets Include="libpng-build"/>
-    <all-targets Include="netcdf-c-build"/>
-    <all-targets Include="openssl-build"/>
     <all-targets Include="poco-build"/>
-    <all-targets Include="proj-build"/>
-    <all-targets Include="qwt-build"/>
-    <all-targets Include="shapelib-build"/>
-    <all-targets Include="udunits-build"/>
     <all-targets Include="vtk-build"/>
-    <all-targets Include="yaml-cpp-build"/>
-    <all-targets Include="zlib-build"/>
   </ItemGroup>
 
   <Target Name="all" DependsOnTargets="@(all-targets)">
     <Exec Command="create-files.cmd" />
   </Target>
 
-  <!-- all release except vtk-build-release(36:21)-->
+  <!-- all release -->
   <ItemGroup>
-    <appveyor-release-targets Include="expat-build-release"/>
-    <appveyor-release-targets Include="gdal-build-release"/>
-    <appveyor-release-targets Include="geos-build-release"/>
     <appveyor-release-targets Include="hdf5-build-release"/>
-    <appveyor-release-targets Include="iriclib-build-release"/>
-    <appveyor-release-targets Include="libpng-build-release"/>
-    <appveyor-release-targets Include="netcdf-c-build-release"/>
-    <appveyor-release-targets Include="openssl-build-release"/>
     <appveyor-release-targets Include="poco-build-release"/>
-    <appveyor-release-targets Include="proj-build-release"/>
-    <appveyor-release-targets Include="qwt-build"/>
-    <appveyor-release-targets Include="shapelib-build-release"/>
-    <appveyor-release-targets Include="udunits-build-release"/>
-    <appveyor-release-targets Include="yaml-cpp-build-release"/>
   </ItemGroup>
 
   <Target Name="appveyor-release" DependsOnTargets="@(appveyor-release-targets)">
     <Exec Command="create-files.cmd" />
   </Target>
 
-  <!-- all debug except vtk-build-debug(36:21)-->
+  <!-- all debug -->
   <ItemGroup>
-    <appveyor-debug-targets Include="expat-build-debug"/>
-    <appveyor-debug-targets Include="gdal-build-debug"/>
-    <appveyor-debug-targets Include="geos-build-debug"/>
     <appveyor-debug-targets Include="hdf5-build-debug"/>
-    <appveyor-debug-targets Include="iriclib-build-debug"/>
-    <appveyor-debug-targets Include="libpng-build-debug"/>
-    <appveyor-debug-targets Include="netcdf-c-build-debug"/>
-    <appveyor-debug-targets Include="openssl-build-debug"/>
     <appveyor-debug-targets Include="poco-build-debug"/>
-    <appveyor-debug-targets Include="proj-build-debug"/>
-    <appveyor-debug-targets Include="shapelib-build-debug"/>
-    <appveyor-debug-targets Include="udunits-build-debug"/>
-    <appveyor-debug-targets Include="yaml-cpp-build-debug"/>
   </ItemGroup>
 
   <Target Name="appveyor-debug" DependsOnTargets="@(appveyor-debug-targets)">
@@ -77,84 +40,22 @@
 
   <!-- all downloads -->
   <ItemGroup>
-    <download-targets Include="boost-download"/>
-    <download-targets Include="expat-download"/>
-    <download-targets Include="gdal-download"/>
-    <download-targets Include="geos-download"/>
     <download-targets Include="hdf5-download"/>
-    <download-targets Include="iriclib-download"/>
-    <download-targets Include="libpng-download"/>
-    <download-targets Include="netcdf-c-download"/>
-    <download-targets Include="openssl-download"/>
     <download-targets Include="poco-download"/>
-    <download-targets Include="proj-download"/>
-    <download-targets Include="qwt-download"/>
-    <download-targets Include="shapelib-download"/>
-    <download-targets Include="udunits-download"/>
     <download-targets Include="vtk-download"/>
-    <download-targets Include="yaml-cpp-download"/>
-    <download-targets Include="zlib-download"/>
   </ItemGroup>
 
   <Target Name="download" DependsOnTargets="@(download-targets)">
   </Target>
 
-  <!-- shapelib -->
-  <Import Project="shapelib.targets" />
-
-  <!-- qwt -->
-  <Import Project="qwt.targets" />
-
-  <!-- gdal -->
-  <Import Project="gdal.targets" />
+  <!-- vtk -->
+  <Import Project="vtk.targets" />
 
   <!-- poco -->
   <Import Project="poco.targets" />
 
-  <!-- vtk -->
-  <Import Project="vtk.targets" />
-
-  <!-- proj -->
-  <Import Project="proj.targets" />
-
-  <!-- sqlite -->
-  <Import Project="sqlite.targets" />
-
-  <!-- libtiff -->
-  <Import Project="libtiff.targets" />
-
-  <!-- netcdf-c -->
-  <Import Project="netcdf-c.targets" />
-
-  <!-- libpng -->
-  <Import Project="libpng.targets" />
-
-  <!-- iriclib -->
-  <Import Project="iriclib.targets" />
-
   <!-- hdf5 -->
   <Import Project="hdf5.targets" />
-
-  <!-- geos -->
-  <Import Project="geos.targets" />
-
-  <!-- yaml-cpp -->
-  <Import Project="yaml.targets" />
-
-  <!-- boost -->
-  <Import Project="boost.targets" />
-
-  <!-- expat -->
-  <Import Project="expat.targets" />
-
-  <!-- udunits -->
-  <Import Project="udunits.targets" />
-
-  <!-- OpenSSL -->
-  <Import Project="openssl.targets" />
-
-  <!-- zlib -->
-  <Import Project="zlib.targets" />
 
   <Target Name="download-dir">
     <MakeDir Directories="$(DOWNLOADS_DIR)" />
@@ -162,32 +63,15 @@
 
   <!-- dump variables -->
   <Target Name="dump">
-    <Message Text="BOOST_UVER=$(BOOST_UVER)" />
-    <Message Text="BOOST_VER=$(BOOST_VER)" />
     <Message Text="BUILD_TOOLS=$(BUILD_TOOLS)" />
     <Message Text="CURL=$(CURL)" />
-    <Message Text="EXPAT_VER=$(EXPAT_VER)" />
-    <Message Text="GDAL_VER=$(GDAL_VER)" />
-    <Message Text="GEOS_VER=$(GEOS_VER)" />
     <Message Text="HDF5_MAJMIN=$(HDF5_MAJMIN)" />
     <Message Text="HDF5_VER=$(HDF5_VER)" />
     <Message Text="INSTALL_DIR=$(INSTALL_DIR)" />
-    <Message Text="IRICLIB_VER=$(IRICLIB_VER)" />
-    <Message Text="IRICLIB_ADF_SVER=$(IRICLIB_ADF_SVER)" />
-    <Message Text="IRICLIB_ADF_VER=$(IRICLIB_ADF_VER)" />
-    <Message Text="NETCDF_VER=$(NETCDF_VER)" />
     <Message Text="POCO_VER=$(POCO_VER)" />
-    <Message Text="PROJ_VER=$(PROJ_VER)" />
-    <Message Text="QT_CMAKE_DIR=$(QT_CMAKE_DIR)" />
-    <Message Text="QT_DIR=$(QT_DIR)" />
-    <Message Text="QWT_VER=$(QWT_VER)" />
-    <Message Text="SHAPELIB_VER=$(SHAPELIB_VER)" />
     <Message Text="SRC_DIR=$(SRC_DIR)" />
-    <Message Text="UDUNITS_VER=$(UDUNITS_VER)" />
     <Message Text="VTK_MAJMIN=$(VTK_MAJMIN)" />
     <Message Text="VTK_VER=$(VTK_VER)" />
-    <Message Text="YAML_CPP_VER=$(YAML_CPP_VER)" />
-    <Message Text="ZLIB_VER=$(ZLIB_VER)" />
     <Message Text="Environment:" />
     <Exec Command="set" />
   </Target>

@@ -33,7 +33,7 @@ set(BUILD_OPTIONS
 # -DModule_vtkGUISupportQtOpenGL:BOOL=ON
 # -DModule_vtkRenderingQt:BOOL=ON
 # -DModule_vtkViewsQt:BOOL=ON
-# -DVTK_QT_VERSION:STRING=5
+# -DVTK_QT_VERSION:STRING=6
 
 if("${CONF_DIR}" STREQUAL "debug-vtk-leaks")
   list(APPEND BUILD_OPTIONS "-DVTK_DEBUG_LEAKS:BOOL=ON")
