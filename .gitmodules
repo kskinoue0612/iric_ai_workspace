@@ -1,3 +1,6 @@
 [submodule "dependencies"]
 	path = dependencies
 	url = https://github.com/kskinoue0612/iric_ai_depenencies.git
+[submodule "iriclib"]
+	path = iriclib
+	url = https://github.com/i-RIC/iriclib_v4.git
