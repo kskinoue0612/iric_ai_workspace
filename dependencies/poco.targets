@@ -1,0 +1,75 @@
+<Project DefaultTargets="poco-build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <Import Project="programs.prop" Condition="'$(CURL)'==''" />
+
+  <Import Project="directories.prop" Condition="'$(TOP_DIR)'==''" />
+
+  <PropertyGroup>
+    <poco_opts>$(poco_opts)</poco_opts>
+    <poco_opts>$(poco_opts) -D"CTEST_PROJECT_NAME:STRING=poco"</poco_opts>
+    <poco_opts>$(poco_opts) -D"CTEST_PROJECT_VERSION:STRING=$(POCO_VER)"</poco_opts>
+    <poco_opts>$(poco_opts) -D"CTEST_SOURCE_DIRECTORY:PATH=lib/src/poco-$(POCO_VER)"</poco_opts>
+    <GENERATOR_NO_QUOTES>$([System.String]::Copy($(GENERATOR)).Replace('"','') )</GENERATOR_NO_QUOTES>
+  </PropertyGroup>
+
+  <Target Name="poco-clean">
+    <RemoveDir Directories="$(BUILD_DIR)\poco-$(POCO_VER)" />
+    <RemoveDir Directories="$(SRC_DIR)\poco-$(POCO_VER)" />
+    <Delete Files="$(DOWNLOADS_DIR)\poco-$(POCO_VER)-release.zip" />
+  </Target>
+
+  <Target Name="poco-build" DependsOnTargets="poco-build-debug;poco-build-release" />
+
+  <!-- Both debug and release versions are installed to the same directory -->
+
+  <Target Name="poco-build-debug" Inputs="poco.targets;poco.cmake" Outputs="$(INSTALL_DIR)\poco-$(POCO_VER)\lib\PocoFoundationd.lib" DependsOnTargets="poco-src">
+    <RemoveDir Directories="$(BUILD_DIR)\poco-$(POCO_VER)\debug" />
+    <PropertyGroup>
+      <poco_opts_debug>$(poco_opts)</poco_opts_debug>
+      <poco_opts_debug>$(poco_opts_debug) -D"CTEST_BINARY_DIRECTORY:PATH=lib/build/poco-$(POCO_VER)/debug"</poco_opts_debug>
+      <poco_opts_debug>$(poco_opts_debug) -D"CTEST_CMAKE_GENERATOR:STRING=$(GENERATOR_NO_QUOTES)"</poco_opts_debug>
+    </PropertyGroup>
+    <Exec Command="ctest -S poco.cmake $(poco_opts_debug) -C Debug -VV -O $(LOG_DIR)\$(SGEN)-poco-debug.log" />
+  </Target>
+
+  <Target Name="poco-build-release" Inputs="poco.targets;poco.cmake" Outputs="$(INSTALL_DIR)\poco-$(POCO_VER)\lib\PocoFoundation.lib" DependsOnTargets="poco-src">
+    <RemoveDir Directories="$(BUILD_DIR)\poco-$(POCO_VER)\release" />
+    <PropertyGroup>
+      <poco_opts_release>$(poco_opts)</poco_opts_release>
+      <poco_opts_release>$(poco_opts_release) -D"CTEST_BINARY_DIRECTORY:PATH=lib/build/poco-$(POCO_VER)/release"</poco_opts_release>
+      <poco_opts_release>$(poco_opts_release) -D"CTEST_CMAKE_GENERATOR:STRING=$(GENERATOR_NO_QUOTES)"</poco_opts_release>
+    </PropertyGroup>
+    <Exec Command="ctest -S poco.cmake $(poco_opts_release) -C Release -VV -O $(LOG_DIR)\$(SGEN)-poco-release.log" />
+  </Target>
+
+  <Target Name="poco-build-relwithdebinfo" Inputs="poco.targets;poco.cmake" Outputs="$(INSTALL_DIR)\poco-$(POCO_VER)\lib\PocoFoundation.lib" DependsOnTargets="poco-src">
+    <RemoveDir Directories="$(BUILD_DIR)\poco-$(POCO_VER)\relwithdebinfo" />
+    <PropertyGroup>
+      <poco_opts_relwithdebinfo>$(poco_opts)</poco_opts_relwithdebinfo>
+      <poco_opts_relwithdebinfo>$(poco_opts_relwithdebinfo) -D"CTEST_BINARY_DIRECTORY:PATH=lib/build/poco-$(POCO_VER)/relwithdebinfo"</poco_opts_relwithdebinfo>
+      <poco_opts_relwithdebinfo>$(poco_opts_relwithdebinfo) -D"CTEST_CMAKE_GENERATOR:STRING=$(GENERATOR_NO_QUOTES)"</poco_opts_relwithdebinfo>
+    </PropertyGroup>
+    <Exec Command="ctest -S poco.cmake $(poco_opts_relwithdebinfo) -C RelWithDebInfo -VV -O $(LOG_DIR)\$(SGEN)-poco-relwithdebinfo.log" />
+  </Target>
+
+  <Target Name="poco-src" DependsOnTargets="poco-download" Condition="!Exists('$(SRC_DIR)\poco-$(POCO_VER)')">
+    <Exec Command="7z x $(DOWNLOADS_DIR)\poco-$(POCO_VER)-release.zip -o$(SRC_DIR)" />
+    <Exec Command="ren $(SRC_DIR)\poco-poco-$(POCO_VER)-release poco-$(POCO_VER)" />
+  </Target>
+
+  <Target Name="poco-download" Condition="!Exists('$(DOWNLOADS_DIR)\poco-$(POCO_VER)-release.zip')">
+    <MakeDir Directories="$(DOWNLOADS_DIR)" />
+    <Message Text="Downloading poco-$(POCO_VER).zip" />
+    <Exec Command="$(CURL) https://github.com/pocoproject/poco/archive/poco-$(POCO_VER)-release.zip" WorkingDirectory="$(DOWNLOADS_DIR)" />
+  </Target>
+
+  <Target Name="poco-dump">
+    <Message Text="poco_opts=$(poco_opts)" />
+    <Message Text="poco_opts_debug=$(poco_opts_debug)" />
+    <Message Text="poco_opts_release=$(poco_opts_release)" />
+    <Message Text="poco_opts_relwithdebinfo=$(poco_opts_relwithdebinfo)" />
+    <Message Text="GENERATOR=$(GENERATOR)" />
+    <Message Text="GENERATOR_NO_QUOTES=$(GENERATOR_NO_QUOTES)" />
+  </Target>
+
+</Project>

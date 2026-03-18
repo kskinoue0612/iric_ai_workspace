@@ -1,0 +1,107 @@
+<Project DefaultTargets="gdal-build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <Import Project="programs.prop" Condition="'$(CURL)'==''" />
+
+  <Import Project="directories.prop" Condition="'$(TOP_DIR)'==''" />
+
+  <PropertyGroup>
+    <!-- <GDAL_VER Condition=" '$(GDAL_VER)' == '' ">3.0.4</GDAL_VER> -->
+    <gdal_src>$(TOP_DIR)\lib\src\gdal-$(GDAL_VER)</gdal_src>
+    <gdal_inst>$(TOP_DIR)\$(INSTALL_DIR)\gdal-$(GDAL_VER)</gdal_inst>
+
+    <gdal_opts>$(gdal_opts) WIN64=YES</gdal_opts>
+    <gdal_opts>$(gdal_opts) MSVC_VER=1926</gdal_opts>
+    <gdal_opts>$(gdal_opts) NETCDF_PLUGIN=YES</gdal_opts>
+    <gdal_opts>$(gdal_opts) NETCDF_SETTING=YES</gdal_opts>
+    <gdal_opts>$(gdal_opts) NETCDF_HAS_NC4=YES</gdal_opts>
+
+    <!-- debug -->
+    <gdal_opts_debug>$(gdal_opts) DEBUG=1</gdal_opts_debug>
+    <gdal_opts_debug>$(gdal_opts_debug) WITH_PDB=1</gdal_opts_debug>
+    <gdal_opts_debug>$(gdal_opts_debug) GDAL_HOME=$(gdal_inst)\debug</gdal_opts_debug>
+    <gdal_opts_debug>$(gdal_opts_debug) NETCDF_LIB=$(TOP_DIR)\$(INSTALL_DIR)\netcdf-c-$(NETCDF_VER)\debug\lib\netcdf.lib</gdal_opts_debug>
+    <gdal_opts_debug>$(gdal_opts_debug) NETCDF_INC_DIR=$(TOP_DIR)\$(INSTALL_DIR)\netcdf-c-$(NETCDF_VER)\debug\include</gdal_opts_debug>
+    <gdal_opts_debug>$(gdal_opts_debug) PROJ_INCLUDE=-I$(TOP_DIR)\$(INSTALL_DIR)\proj-$(PROJ_VER)\debug\include</gdal_opts_debug>
+    <gdal_opts_debug>$(gdal_opts_debug) PROJ_LIBRARY=$(TOP_DIR)\$(INSTALL_DIR)\proj-$(PROJ_VER)\debug\lib\proj_d.lib</gdal_opts_debug>
+
+    <!-- release -->
+    <gdal_opts_release>$(gdal_opts) GDAL_HOME=$(gdal_inst)\release</gdal_opts_release>
+    <gdal_opts_release>$(gdal_opts_release) NETCDF_LIB=$(TOP_DIR)\$(INSTALL_DIR)\netcdf-c-$(NETCDF_VER)\release\lib\netcdf.lib</gdal_opts_release>
+    <gdal_opts_release>$(gdal_opts_release) NETCDF_INC_DIR=$(TOP_DIR)\$(INSTALL_DIR)\netcdf-c-$(NETCDF_VER)\release\include</gdal_opts_release>
+    <gdal_opts_release>$(gdal_opts_release) PROJ_INCLUDE=-I$(TOP_DIR)\$(INSTALL_DIR)\proj-$(PROJ_VER)\release\include</gdal_opts_release>
+    <gdal_opts_release>$(gdal_opts_release) PROJ_LIBRARY=$(TOP_DIR)\$(INSTALL_DIR)\proj-$(PROJ_VER)\release\lib\proj.lib</gdal_opts_release>
+
+    <makefile>$(TOP_DIR)\$(SRC_DIR)\gdal-$(GDAL_VER)\makefile.vc</makefile>
+  </PropertyGroup>
+
+  <!-- @(gdal-build-debug-deps) -->
+  <ItemGroup>
+    <gdal-build-debug-deps Include="gdal-src"/>
+    <gdal-build-debug-deps Include="netcdf-c-build-debug" Condition=" '$(UseDeps)' == 'Yes' " />
+    <gdal-build-debug-deps Include="proj-build-debug" Condition=" '$(UseDeps)' == 'Yes' " />
+  </ItemGroup>
+
+  <!-- @(gdal-build-release-deps) -->
+  <ItemGroup>
+    <gdal-build-release-deps Include="gdal-src"/>
+    <gdal-build-release-deps Include="netcdf-c-build-release" Condition=" '$(UseDeps)' == 'Yes' " />
+    <gdal-build-release-deps Include="proj-build-release" Condition=" '$(UseDeps)' == 'Yes' " />
+  </ItemGroup>
+
+  <Target Name="gdal-clean" DependsOnTargets="netcdf-c-clean;proj-clean">
+    <Exec WorkingDirectory="$(gdal_src)" Command="nmake -f $(makefile) $(gdal_opts_release) clean"  />
+    <Exec WorkingDirectory="$(gdal_src)" Command="nmake -f $(makefile) $(gdal_opts_debug) clean"  />
+    <Delete Files="$(DOWNLOADS_DIR)\gdal-$(GDAL_VER).tar.gz" />
+  </Target>
+
+  <Target Name="gdal-build" DependsOnTargets="gdal-build-debug;gdal-build-release" />
+
+  <Target Name="gdal-build-release" Inputs="gdal.targets;$(INSTALL_DIR)\netcdf-c-$(NETCDF_VER)\release\lib\netcdf.lib;$(INSTALL_DIR)\proj-$(PROJ_VER)\release\lib\proj.lib" Outputs="$(INSTALL_DIR)\gdal-$(GDAL_VER)\release\lib\gdal_i.lib" DependsOnTargets="@(gdal-build-release-deps)">
+    <PropertyGroup>
+      <gdal_home>$(gdal_inst)\release</gdal_home>
+    </PropertyGroup>
+
+    <RemoveDir Directories="$(gdal_home)" />
+    <!-- appveyor calls mkdir from nmake error -->
+    <MakeDir Directories="$(gdal_home)" />
+    <MakeDir Directories="$(gdal_home)\bin" />
+    <MakeDir Directories="$(gdal_home)\bin\gdalplugins" />
+    <MakeDir Directories="$(gdal_home)\data" />
+    <MakeDir Directories="$(gdal_home)\html" />
+    <MakeDir Directories="$(gdal_home)\include" />
+    <MakeDir Directories="$(gdal_home)\lib" />
+    <Exec WorkingDirectory="$(gdal_src)" Command="nmake -f $(makefile) $(gdal_opts_release) clean"  />
+    <Exec WorkingDirectory="$(gdal_src)" Command="nmake -f $(makefile) $(gdal_opts_release)" />
+    <Exec WorkingDirectory="$(gdal_src)" Command="nmake -f $(makefile) $(gdal_opts_release) devinstall" />
+  </Target>
+
+  <Target Name="gdal-build-debug" Inputs="gdal.targets;$(INSTALL_DIR)\netcdf-c-$(NETCDF_VER)\debug\lib\netcdf.lib;$(INSTALL_DIR)\proj-$(PROJ_VER)\debug\lib\proj_d.lib" Outputs="$(INSTALL_DIR)\gdal-$(GDAL_VER)\debug\lib\gdal_i.lib" DependsOnTargets="@(gdal-build-debug-deps)">
+    <PropertyGroup>
+      <gdal_home>$(gdal_inst)\debug</gdal_home>
+    </PropertyGroup>
+
+    <RemoveDir Directories="$(gdal_home)" />
+    <!-- appveyor calls mkdir from nmake error -->
+    <MakeDir Directories="$(gdal_home)" />
+    <MakeDir Directories="$(gdal_home)\bin" />
+    <MakeDir Directories="$(gdal_home)\bin\gdalplugins" />
+    <MakeDir Directories="$(gdal_home)\data" />
+    <MakeDir Directories="$(gdal_home)\html" />
+    <MakeDir Directories="$(gdal_home)\include" />
+    <MakeDir Directories="$(gdal_home)\lib" />
+    <Exec WorkingDirectory="$(gdal_src)" Command="nmake -f $(makefile) $(gdal_opts_debug) clean"  />
+    <Exec WorkingDirectory="$(gdal_src)" Command="nmake -f $(makefile) $(gdal_opts_debug)" />
+    <Exec WorkingDirectory="$(gdal_src)" Command="nmake -f $(makefile) $(gdal_opts_debug) devinstall" />
+  </Target>
+
+  <Target Name="gdal-src" DependsOnTargets="gdal-download" Condition="!Exists('$(SRC_DIR)\gdal-$(GDAL_VER)')">
+    <Exec Command="7z x $(DOWNLOADS_DIR)\gdal-$(GDAL_VER).tar.gz -so | 7z x -si -ttar -o$(SRC_DIR)" />
+  </Target>
+
+  <Target Name="gdal-download" Condition="!Exists('$(DOWNLOADS_DIR)\gdal-$(GDAL_VER).tar.gz')">
+    <MakeDir Directories="$(DOWNLOADS_DIR)" />
+    <Message Text="Downloading gdal-$(GDAL_VER).tar.gz" />
+    <Exec Command="$(CURL) http://download.osgeo.org/gdal/$(GDAL_VER)/gdal-$(GDAL_VER).tar.gz" WorkingDirectory="$(DOWNLOADS_DIR)" />
+  </Target>
+
+</Project>
